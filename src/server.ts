@@ -9,11 +9,13 @@ import cors from 'cors'
 import { handleError } from './middlewares'
 
 import './database'
+import routes from './routes'
 
 const app = express()
 
 app.use(cors({ origin: process.env.ORIGIN, credentials: true }))
 app.use(express.json())
+app.use(routes)
 app.use(handleError)
 
 app.listen(process.env.PORT || 80, () => console.log('SERVER IS RUNNING'))
