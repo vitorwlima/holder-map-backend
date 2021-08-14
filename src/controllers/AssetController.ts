@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
-import { AssetModel } from '../models'
+import { AssetModel, UserModel } from '../models'
 import api from '../services/api'
 
 export class AssetController {
   async addAsset(request: Request, response: Response) {
+    const { user_id } = request
     const { assetCode, price, quantity } = request.body
 
     const { data } = await api.get(`/query?function=GLOBAL_QUOTE&symbol=${assetCode}.SAO&apikey=${process.env.API_KEY}`)
@@ -16,7 +17,7 @@ export class AssetController {
 
     const currentPrice = data['Global Quote']['05. price']
 
-    const asset = await AssetModel.findOne({ assetCode })
+    const asset = await AssetModel.findOne({ assetCode, userId: user_id })
     if (!asset) {
       const assetInfo = {
         assetCode,
@@ -26,6 +27,7 @@ export class AssetController {
         quantity,
         totalInvested: price * quantity,
         totalValue: currentPrice * quantity,
+        userId: user_id,
       }
 
       const newAsset = await new AssetModel(assetInfo).save()
@@ -46,7 +48,8 @@ export class AssetController {
   }
 
   async listAssets(request: Request, response: Response) {
-    const assets = await AssetModel.find()
+    const { user_id } = request
+    const assets = await AssetModel.find({ userId: user_id })
 
     for (const asset of assets) {
       const { data } = await api.get(

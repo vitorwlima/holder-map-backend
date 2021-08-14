@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
-    "strict": false,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "typeRoots": ["./src/@types"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true

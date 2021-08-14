@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose'
+import { Schema, model, Types } from 'mongoose'
 
 export interface IAsset {
   assetCode: string
@@ -8,6 +8,7 @@ export interface IAsset {
   quantity: number
   totalInvested: number
   totalValue: number
+  userId: Types.ObjectId
 }
 
 const schema = new Schema<IAsset>(
@@ -19,6 +20,7 @@ const schema = new Schema<IAsset>(
     quantity: { type: Number, required: true },
     totalInvested: { type: Number, required: true },
     totalValue: { type: Number, required: true },
+    userId: { type: Types.ObjectId, required: true },
   },
   { timestamps: true }
 )
