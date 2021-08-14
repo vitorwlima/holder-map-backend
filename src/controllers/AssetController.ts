@@ -10,6 +10,9 @@ export class AssetController {
     if (!data['Global Quote']['01. symbol']) {
       throw new Error('Código de ação inválido.')
     }
+    if (data['Note']) {
+      throw new Error('Muitas requisições. Tente novamente após 1 minuto.')
+    }
 
     const currentPrice = data['Global Quote']['05. price']
 
