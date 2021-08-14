@@ -58,7 +58,7 @@ export class AssetController {
 
       const currentPrice = data['Global Quote']['05. price']
 
-      asset.currentPrice = currentPrice && 200
+      asset.currentPrice = currentPrice
       asset.profit = (currentPrice * asset.quantity) / (asset.price * asset.quantity) - 1
       asset.totalValue = currentPrice * asset.quantity
 
