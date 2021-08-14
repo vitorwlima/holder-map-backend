@@ -44,26 +44,24 @@ export class AssetController {
 
   async listAssets(request: Request, response: Response) {
     const assets = await AssetModel.find()
-    const newAssets = []
 
     for (const asset of assets) {
       const { data } = await api.get(
         `/query?function=GLOBAL_QUOTE&symbol=${asset.assetCode}.SAO&apikey=${process.env.API_KEY}`
       )
       if (data['Note']) {
-        return newAssets.push(asset)
+        return
       }
 
       const currentPrice = data['Global Quote']['05. price']
 
-      asset.currentPrice = currentPrice
+      asset.currentPrice = currentPrice && 200
       asset.profit = (currentPrice * asset.quantity) / (asset.price * asset.quantity) - 1
       asset.totalValue = currentPrice * asset.quantity
 
       await asset.save()
-      newAssets.push(asset)
     }
 
-    return response.json(newAssets)
+    return response.json(assets)
   }
 }
