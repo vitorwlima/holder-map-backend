@@ -60,15 +60,12 @@ export class AssetController {
       const { data } = await api.get(
         `/query?function=GLOBAL_QUOTE&symbol=${asset.assetCode}.SAO&apikey=${process.env.API_KEY}`
       )
-      if (data['Note']) {
-        return
-      }
 
-      const currentPrice = data['Global Quote']['05. price']
+      const currentPrice = data && data['Global Quote'] && data['Global Quote']['05. price']
 
-      asset.currentPrice = currentPrice
-      asset.profit = (currentPrice * asset.quantity) / (asset.price * asset.quantity) - 1
-      asset.totalValue = currentPrice * asset.quantity
+      asset.currentPrice = currentPrice || asset.currentPrice
+      asset.profit = (currentPrice * asset.quantity) / (asset.price * asset.quantity) - 1 || asset.profit
+      asset.totalValue = currentPrice * asset.quantity || asset.totalValue
 
       await asset.save()
 
