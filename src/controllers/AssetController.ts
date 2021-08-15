@@ -51,6 +51,11 @@ export class AssetController {
     const { user_id } = request
     const assets = await AssetModel.find({ userId: user_id })
 
+    let totalPrice = 0
+    let totalQuantity = 0
+    let totalInvested = 0
+    let totalValue = 0
+
     for (const asset of assets) {
       const { data } = await api.get(
         `/query?function=GLOBAL_QUOTE&symbol=${asset.assetCode}.SAO&apikey=${process.env.API_KEY}`
@@ -66,8 +71,25 @@ export class AssetController {
       asset.totalValue = currentPrice * asset.quantity
 
       await asset.save()
+
+      totalPrice += asset.price
+      totalQuantity += asset.quantity
+      totalInvested += asset.totalInvested
+      totalValue += asset.totalValue
     }
 
-    return response.json(assets)
+    const total = {
+      assetCode: 'TOTAL',
+      price: totalInvested / totalQuantity || 0,
+      currentPrice: totalValue / totalQuantity || 0,
+      profit: totalValue / totalInvested - 1 || 0,
+      quantity: totalQuantity || 0,
+      totalInvested: totalInvested || 0,
+      totalValue: totalValue || 0,
+    }
+
+    const assetsWithTotal = [...assets, total]
+
+    return response.json(assetsWithTotal)
   }
 }
