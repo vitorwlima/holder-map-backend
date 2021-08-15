@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { sign } from 'jsonwebtoken'
+import { sign, verify } from 'jsonwebtoken'
 import { compare, hash } from 'bcryptjs'
 
 import { UserModel } from '../models'
@@ -32,8 +32,26 @@ export class UserController {
       throw new Error('Senha incorreta.')
     }
 
-    const token = sign({}, process.env.TOKEN_HASH!, { subject: user._id.toString(), expiresIn: '12h' })
+    const token = sign({}, process.env.TOKEN_HASH!, { subject: user._id.toString(), expiresIn: '4d' })
 
     return response.json({ user, token })
+  }
+
+  async loginWithToken(request: Request, response: Response) {
+    const { token } = request.params
+
+    try {
+      const { sub } = verify(token, process.env.TOKEN_HASH!)
+
+      const user = await UserModel.findById(sub)
+      if (!user) {
+        return response.end()
+      }
+
+      const newToken = sign({}, process.env.TOKEN_HASH!, { subject: user._id.toString(), expiresIn: '4d' })
+      return response.json({ user, newToken })
+    } catch {
+      return response.end()
+    }
   }
 }

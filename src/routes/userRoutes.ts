@@ -7,3 +7,4 @@ const userController = new UserController()
 
 userRoutes.post('/register', userController.register)
 userRoutes.post('/authenticate', userController.authenticate)
+userRoutes.get('/user/:token', userController.loginWithToken)
